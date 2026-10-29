@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: header('Welcome')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container" style="text-align: center; padding: 3rem 1rem;">
+    <div style="max-width: 780px; margin: 0 auto;">
+        <span class="badge badge-room" style="font-size: 0.85rem; padding: 0.35rem 0.85rem; margin-bottom: 1rem;">Campus Resource Portal</span>
+        <h1 style="font-size: 2.8rem; font-weight: 800; line-height: 1.15; margin: 1rem 0; color: var(--text-main);">
+            Streamlined Campus Room &amp; Equipment Booking
+        </h1>
+        <p style="font-size: 1.15rem; color: var(--text-secondary); margin-bottom: 2rem;">
+            SlotWise empowers students and academic staff to instantly discover seminar rooms, computer labs, and multimedia equipment, verify real-time availability, and eliminate schedule conflicts with automated conflict detection.
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem;">
+            <a th:href="@{/register}" class="btn btn-primary" style="padding: 0.75rem 1.75rem; font-size: 1rem;">Get Started &bull; Register</a>
+            <a th:href="@{/login}" class="btn btn-outline" style="padding: 0.75rem 1.75rem; font-size: 1rem;">Sign In to Dashboard</a>
+        </div>
+
+        <div class="stats-grid" style="text-align: left; margin-top: 3rem;">
+            <div class="stat-card">
+                <span class="stat-title">Smart Conflict Engine</span>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    Backend query validation prevents overlapping bookings. Adjacent slots (e.g. 10:00-11:00 and 11:00-12:00) remain cleanly bookable.
+                </p>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Persistent MySQL Store</span>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    Relational integrity with Spring Data JPA and Hibernate. Records persist securely across restarts.
+                </p>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Role-Based Access</span>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    Dedicated administrative portal for facility management, capacity control, and institution-wide booking oversight.
+                </p>
+            </div>
+        </div>
+
+        <div style="margin-top: 3rem; background: var(--bg-card); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); text-align: left;">
+            <h4 style="margin-bottom: 0.5rem; color: var(--text-deep);">Default Evaluation Accounts:</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; font-size: 0.9rem;">
+                <div style="background: var(--bg-subtle); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <strong>Administrator:</strong> <code>admin@slotwise.edu</code><br>
+                    <strong>Password:</strong> <code>Admin@1234</code>
+                </div>
+                <div style="background: var(--bg-subtle); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <strong>Demo Student:</strong> <code>student@slotwise.edu</code><br>
+                    <strong>Password:</strong> <code>Student@1234</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

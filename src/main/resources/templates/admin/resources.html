@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Manage Resources')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container">
+    <div class="page-header">
+        <div>
+            <h1>Facility &amp; Equipment Management</h1>
+            <p>Add, edit, inspect, and toggle active status of campus resources</p>
+        </div>
+        <a th:href="@{/admin/resources/new}" class="btn btn-primary">+ Add New Resource</a>
+    </div>
+
+    <!-- Feedback messages -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Location</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="r : ${resources}">
+                    <td><strong th:text="'#' + ${r.id}">#1</strong></td>
+                    <td><strong th:text="${r.name}">Seminar Room A</strong></td>
+                    <td>
+                        <span th:class="'badge ' + (${r.type.name() == 'ROOM'} ? 'badge-room' : 'badge-equipment')"
+                              th:text="${r.type.displayName}">Room</span>
+                    </td>
+                    <td style="max-width: 250px; font-size: 0.85rem; color: var(--text-secondary);" th:text="${r.description}">Desc</td>
+                    <td th:text="${r.location}">Building 1</td>
+                    <td><span th:text="${r.capacity != null ? r.capacity + ' people' : '-'}">40</span></td>
+                    <td>
+                        <span th:if="${r.active}" class="badge badge-active">Active</span>
+                        <span th:if="${!r.active}" class="badge badge-inactive">Inactive</span>
+                    </td>
+                    <td style="font-size: 0.8rem; color: var(--text-muted);"
+                        th:text="${#temporals.format(r.createdAt, 'dd MMM yyyy')}">2026-10-29</td>
+                    <td>
+                        <div style="display: flex; gap: 0.4rem;">
+                            <a th:href="@{/admin/resources/{id}/edit(id=${r.id})}" class="btn btn-outline btn-sm">Edit</a>
+                            <form th:action="@{/admin/resources/{id}/toggle-status(id=${r.id})}" method="post" class="confirm-toggle" style="display: inline;">
+                                <button type="submit" class="btn btn-outline btn-sm"
+                                        th:style="${r.active} ? 'color: var(--danger); border-color: var(--danger-border);' : 'color: var(--success); border-color: var(--success-border);'"
+                                        th:text="${r.active} ? 'Deactivate' : 'Activate'">Toggle</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

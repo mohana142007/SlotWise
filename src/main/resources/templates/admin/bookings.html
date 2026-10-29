@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Manage All Bookings')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container">
+    <div class="page-header">
+        <div>
+            <h1>All System Bookings</h1>
+            <p>Oversight of student and faculty reservations across all campus resources</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <a th:href="@{/admin/dashboard}" class="btn btn-outline">&larr; Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Feedback messages -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <!-- Filter by Status -->
+    <div class="filter-card" style="padding: 0.75rem 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <span style="font-weight: 600; font-size: 0.9rem;">Filter by Status:</span>
+            <a th:href="@{/admin/bookings}"
+               th:class="'btn btn-sm ' + (${selectedStatus == null} ? 'btn-primary' : 'btn-outline')">All Bookings</a>
+            <a th:each="st : ${statuses}"
+               th:href="@{/admin/bookings(status=${st})}"
+               th:class="'btn btn-sm ' + (${selectedStatus == st} ? 'btn-primary' : 'btn-outline')"
+               th:text="${st.displayName}">Status</a>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${#lists.isEmpty(bookings)}" class="empty-state">
+        <div class="empty-icon">&#128197;</div>
+        <h3>No bookings found</h3>
+        <p>No reservations matched the selected criteria.</p>
+    </div>
+
+    <!-- Bookings Table -->
+    <div th:if="${!#lists.isEmpty(bookings)}" class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Resource</th>
+                    <th>Date</th>
+                    <th>Time Slot</th>
+                    <th>Purpose</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Admin Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="b : ${bookings}">
+                    <td><strong th:text="'#' + ${b.id}">#1</strong></td>
+                    <td>
+                        <strong th:text="${b.user.fullName}">Alex Johnson</strong><br>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);" th:text="${b.user.email}">student@slotwise.edu</span>
+                    </td>
+                    <td>
+                        <strong th:text="${b.resource.name}">Seminar Room A</strong><br>
+                        <span th:class="'badge ' + (${b.resource.type.name() == 'ROOM'} ? 'badge-room' : 'badge-equipment')"
+                              th:text="${b.resource.type.displayName}">Room</span>
+                    </td>
+                    <td th:text="${#temporals.format(b.bookingDate, 'dd MMM yyyy')}">2026-10-30</td>
+                    <td><strong th:text="${b.startTime} + ' - ' + ${b.endTime}">10:00 - 11:00</strong></td>
+                    <td th:text="${b.purpose}">Project presentation</td>
+                    <td>
+                        <span th:if="${b.confirmed}" class="badge badge-confirmed">Confirmed</span>
+                        <span th:if="${b.cancelled}" class="badge badge-cancelled">Cancelled</span>
+                    </td>
+                    <td style="font-size: 0.8rem; color: var(--text-muted);"
+                        th:text="${#temporals.format(b.createdAt, 'dd MMM yyyy, HH:mm')}">2026-10-29 10:00</td>
+                    <td>
+                        <form th:if="${b.confirmed}" th:action="@{/admin/bookings/{id}/cancel(id=${b.id})}" method="post" class="confirm-cancel" style="display: inline;">
+                            <button type="submit" class="btn btn-outline btn-sm" style="color: var(--danger); border-color: var(--danger-border);">
+                                Revoke / Cancel
+                            </button>
+                        </form>
+                        <span th:if="${b.cancelled}" style="font-size: 0.8rem; color: var(--text-muted);">
+                            Cancelled
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

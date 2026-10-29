@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Browse Resources')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container">
+    <div class="page-header">
+        <div>
+            <h1>Campus Resources</h1>
+            <p>Search rooms and equipment, check live availability, and reserve time slots</p>
+        </div>
+    </div>
+
+    <!-- Filter & Availability Check Bar -->
+    <div class="filter-card">
+        <form th:action="@{/resources}" th:object="${filter}" method="get">
+            <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--text-strong);">
+                Search &amp; Real-Time Availability Filter:
+            </div>
+            <div class="filter-grid">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="query">Keyword / Name</label>
+                    <input type="text" id="query" th:field="*{query}" class="form-control" placeholder="e.g. Lab, Projector, Seminar">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="type">Resource Type</label>
+                    <select id="type" th:field="*{type}" class="form-control">
+                        <option value="">All Types</option>
+                        <option th:each="t : ${resourceTypes}" th:value="${t}" th:text="${t.displayName}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" th:field="*{location}" class="form-control" placeholder="e.g. IT Block, Building 1">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" th:field="*{date}" class="form-control future-date">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="startTime">Start Time</label>
+                    <input type="time" id="startTime" th:field="*{startTime}" class="form-control">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="endTime">End Time</label>
+                    <input type="time" id="endTime" th:field="*{endTime}" class="form-control">
+                </div>
+
+                <div style="display: flex; gap: 0.5rem;">
+                    <button type="submit" class="btn btn-primary" style="height: 40px;">Search</button>
+                    <a th:href="@{/resources}" class="btn btn-outline" style="height: 40px;">Reset</a>
+                </div>
+            </div>
+        </form>
+
+        <div th:if="${hasTimeFilter}" style="margin-top: 0.85rem; padding: 0.5rem 0.75rem; background: var(--success-bg); border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--success-text);">
+            &#10003; Showing only resources that are completely <strong>available</strong> on
+            <strong th:text="${#temporals.format(filter.date, 'dd MMM yyyy')}"></strong> from
+            <strong th:text="${filter.startTime}"></strong> to <strong th:text="${filter.endTime}"></strong>.
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${#lists.isEmpty(resources)}" class="empty-state">
+        <div class="empty-icon">&#128269;</div>
+        <h3>No resources found</h3>
+        <p>No facilities matched your search criteria or are available for the selected slot.</p>
+        <a th:href="@{/resources}" class="btn btn-outline btn-sm">Clear All Filters</a>
+    </div>
+
+    <!-- Resource Cards Grid -->
+    <div th:if="${!#lists.isEmpty(resources)}" class="cards-grid">
+        <div th:each="r : ${resources}" class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title" th:text="${r.name}">Seminar Room A</h3>
+                    <span th:class="'badge ' + (${r.type.name() == 'ROOM'} ? 'badge-room' : 'badge-equipment')"
+                          th:text="${r.type.displayName}" style="margin-top: 0.4rem;">Room</span>
+                </div>
+                <span th:if="${r.active}" class="badge badge-active">Active</span>
+                <span th:if="${!r.active}" class="badge badge-inactive">Inactive</span>
+            </div>
+            <div class="card-body">
+                <p th:text="${r.description}">Description text</p>
+                <div class="resource-meta">
+                    <div class="meta-item">
+                        <span>&#128205;</span>
+                        <span th:text="${r.location}">Building 1</span>
+                    </div>
+                    <div class="meta-item" th:if="${r.capacity != null}">
+                        <span>&#128101;</span>
+                        <span>Capacity: <strong th:text="${r.capacity}">50</strong> people</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a th:href="@{/resources/{id}(id=${r.id}, date=${filter.date})}" class="btn btn-outline btn-sm">View Schedule</a>
+                <a th:if="${r.active}"
+                   th:href="@{/resources/{id}/book(id=${r.id}, date=${filter.date}, startTime=${filter.startTime}, endTime=${filter.endTime})}"
+                   class="btn btn-primary btn-sm">Book This Slot</a>
+                <span th:if="${!r.active}" class="badge badge-inactive" style="font-size: 0.8rem;">Unavailable</span>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

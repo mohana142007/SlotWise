@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Student Dashboard')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container">
+    <div class="page-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Welcome back, <span th:text="${currentUser.fullName}" style="font-weight: 600; color: var(--primary);">Student</span>!</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <a th:href="@{/resources}" class="btn btn-primary">+ Book a Resource</a>
+            <a th:href="@{/my-bookings}" class="btn btn-outline">My Bookings</a>
+        </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-title">Active Campus Resources</span>
+            <span class="stat-value" th:text="${activeResourceCount}">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-title">My Upcoming Bookings</span>
+            <span class="stat-value" th:text="${userBookingCount}" style="color: var(--primary);">0</span>
+        </div>
+    </div>
+
+    <!-- Upcoming Bookings Section -->
+    <div style="margin-bottom: 2.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 700;">My Upcoming Reservations</h2>
+            <a th:href="@{/my-bookings}" style="font-size: 0.85rem; font-weight: 600;">View All History &rarr;</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(upcomingBookings)}" class="empty-state">
+            <div class="empty-icon">&#128197;</div>
+            <h3>No upcoming bookings</h3>
+            <p>You don't have any reservations scheduled right now.</p>
+            <a th:href="@{/resources}" class="btn btn-primary btn-sm">Explore &amp; Reserve Rooms</a>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(upcomingBookings)}" class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Resource</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Time Slot</th>
+                        <th>Purpose</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="b : ${upcomingBookings}">
+                        <td>
+                            <strong th:text="${b.resource.name}">Seminar Room A</strong><br>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);" th:text="${b.resource.location}">Building 1</span>
+                        </td>
+                        <td>
+                            <span th:class="'badge ' + (${b.resource.type.name() == 'ROOM'} ? 'badge-room' : 'badge-equipment')"
+                                  th:text="${b.resource.type.displayName}">Room</span>
+                        </td>
+                        <td th:text="${#temporals.format(b.bookingDate, 'dd MMM yyyy')}">2026-10-30</td>
+                        <td><strong th:text="${b.startTime} + ' - ' + ${b.endTime}">10:00 - 11:00</strong></td>
+                        <td th:text="${b.purpose}">Group Study</td>
+                        <td>
+                            <span class="badge badge-confirmed" th:text="${b.status.displayName}">Confirmed</span>
+                        </td>
+                        <td>
+                            <form th:action="@{/bookings/{id}/cancel(id=${b.id})}" method="post" class="confirm-cancel" style="display: inline;">
+                                <button type="submit" class="btn btn-outline btn-sm" style="color: var(--danger); border-color: var(--danger-border);">Cancel</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Featured Resources Section -->
+    <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 700;">Available Resources</h2>
+            <a th:href="@{/resources}" style="font-size: 0.85rem; font-weight: 600;">Browse &amp; Filter All &rarr;</a>
+        </div>
+
+        <div class="cards-grid">
+            <div th:each="r : ${featuredResources}" class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title" th:text="${r.name}">Seminar Room A</h3>
+                        <span th:class="'badge ' + (${r.type.name() == 'ROOM'} ? 'badge-room' : 'badge-equipment')"
+                              th:text="${r.type.displayName}" style="margin-top: 0.4rem;">Room</span>
+                    </div>
+                    <span class="badge badge-active">Available</span>
+                </div>
+                <div class="card-body">
+                    <p th:text="${r.description}">Room description</p>
+                    <div class="resource-meta">
+                        <div class="meta-item">
+                            <span>&#128205;</span>
+                            <span th:text="${r.location}">Location</span>
+                        </div>
+                        <div class="meta-item" th:if="${r.capacity != null}">
+                            <span>&#128101;</span>
+                            <span>Capacity: <strong th:text="${r.capacity}">50</strong> people</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/resources/{id}(id=${r.id})}" class="btn btn-outline btn-sm">View Schedule</a>
+                    <a th:href="@{/resources/{id}/book(id=${r.id})}" class="btn btn-primary btn-sm">Book Slot</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

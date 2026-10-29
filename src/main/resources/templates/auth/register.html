@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Register')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container" style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+    <div class="form-card" style="width: 100%; max-width: 480px;">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div class="brand-icon" style="margin: 0 auto 0.75rem auto; width: 44px; height: 44px; font-size: 1.3rem;">SW</div>
+            <h2 style="font-size: 1.5rem; font-weight: 700;">Create an Account</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Join SlotWise to reserve academic facilities</p>
+        </div>
+
+        <!-- Error Alert -->
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <form th:action="@{/register}" th:object="${registrationDto}" method="post">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" th:field="*{fullName}" class="form-control" placeholder="e.g. Jordan Smith" required>
+                <div class="form-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Campus Email Address</label>
+                <input type="email" id="email" th:field="*{email}" class="form-control" placeholder="name@college.edu" required>
+                <div class="form-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Register as</label>
+                <select id="role" th:field="*{role}" class="form-control" required>
+                    <option value="">Select Student or Faculty</option>
+                    <option th:each="role : ${registrationRoles}"
+                            th:value="${role.name()}"
+                            th:text="${role.displayName}"></option>
+                </select>
+                <div class="form-error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password (min 6 characters)</label>
+                <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="Create a secure password" required>
+                <div class="form-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="form-control" placeholder="Re-type your password" required>
+                <div class="form-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 1rem; margin-top: 0.5rem;">Register Account</button>
+        </form>
+
+        <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color); font-size: 0.85rem; text-align: center; color: var(--text-muted);">
+            Already registered? <a th:href="@{/login}" style="font-weight: 600;">Sign in here</a>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

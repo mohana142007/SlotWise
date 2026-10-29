@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="header(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - SlotWise'">SlotWise - Room & Equipment Booking</title>
+    <script>
+        (() => {
+            const savedTheme = localStorage.getItem('slotwise-theme');
+            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.dataset.theme =
+                savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : systemTheme;
+        })();
+    </script>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav th:fragment="navbar" class="navbar">
+    <div class="brand">
+        <div class="brand-icon">SW</div>
+        <a th:href="@{/}" style="color: inherit; font-weight: 700;">SlotWise</a>
+    </div>
+
+    <ul class="nav-links">
+        <li sec:authorize="isAuthenticated()"><a th:href="@{/dashboard}">Dashboard</a></li>
+        <li sec:authorize="isAuthenticated()"><a th:href="@{/resources}">Browse Resources</a></li>
+        <li sec:authorize="isAuthenticated()"><a th:href="@{/my-bookings}">My Bookings</a></li>
+        
+        <!-- Administrator Menu Links -->
+        <li sec:authorize="hasAuthority('ROLE_ADMIN')"><a th:href="@{/admin/dashboard}" style="color: var(--danger-text); font-weight: 600;">Admin Overview</a></li>
+        <li sec:authorize="hasAuthority('ROLE_ADMIN')"><a th:href="@{/admin/resources}">Manage Resources</a></li>
+        <li sec:authorize="hasAuthority('ROLE_ADMIN')"><a th:href="@{/admin/bookings}">Manage Bookings</a></li>
+    </ul>
+
+    <div class="nav-auth">
+        <button id="theme-toggle" class="btn btn-outline btn-sm theme-toggle" type="button"
+                aria-label="Switch theme" aria-pressed="false">
+            <span class="theme-toggle-label">Theme</span>
+        </button>
+
+        <!-- If Not Logged In -->
+        <div sec:authorize="!isAuthenticated()" style="display: flex; gap: 0.5rem;">
+            <a th:href="@{/login}" class="btn btn-outline btn-sm">Sign In</a>
+            <a th:href="@{/register}" class="btn btn-primary btn-sm">Register</a>
+        </div>
+
+        <!-- If Logged In -->
+        <div sec:authorize="isAuthenticated()" style="display: flex; align-items: center; gap: 0.75rem;">
+            <div class="user-pill">
+                <span sec:authentication="name" style="font-size: 0.85rem;">User</span>
+                <span sec:authorize="hasAuthority('ROLE_ADMIN')" class="role-badge admin">Admin</span>
+                <span sec:authorize="hasAuthority('ROLE_STUDENT')" class="role-badge student">Student</span>
+                <span sec:authorize="hasAuthority('ROLE_FACULTY')" class="role-badge student">Faculty</span>
+            </div>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-outline btn-sm">Sign Out</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<footer th:fragment="footer">
+    <div class="container">
+        <p><strong>SlotWise</strong> &mdash; Academic Room &amp; Equipment Booking System</p>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+</footer>
+
+</body>
+</html>

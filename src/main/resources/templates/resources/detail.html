@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header(${resource.name})}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container">
+    <div style="margin-bottom: 1.5rem;">
+        <a th:href="@{/resources}" style="font-size: 0.9rem; font-weight: 600;">&larr; Back to Resource Catalog</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+        <!-- Left: Resource Info -->
+        <div>
+            <div class="card" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div>
+                        <h1 style="font-size: 1.8rem; font-weight: 700; color: var(--text-main);" th:text="${resource.name}">Seminar Room A</h1>
+                        <span th:class="'badge ' + (${resource.type.name() == 'ROOM'} ? 'badge-room' : 'badge-equipment')"
+                              th:text="${resource.type.displayName}" style="margin-top: 0.5rem;">Room</span>
+                    </div>
+                    <span th:if="${resource.active}" class="badge badge-active">Active</span>
+                    <span th:if="${!resource.active}" class="badge badge-inactive">Inactive</span>
+                </div>
+
+                <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 1.5rem;" th:text="${resource.description}">Description text</p>
+
+                <div class="resource-meta" style="font-size: 0.95rem; gap: 0.75rem;">
+                    <div class="meta-item">
+                        <span>&#128205;</span>
+                        <span><strong>Location:</strong> <span th:text="${resource.location}">Location</span></span>
+                    </div>
+                    <div class="meta-item" th:if="${resource.capacity != null}">
+                        <span>&#128101;</span>
+                        <span><strong>Capacity:</strong> <span th:text="${resource.capacity}">40</span> people</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <a th:if="${resource.active}" th:href="@{/resources/{id}/book(id=${resource.id}, date=${targetDate})}" class="btn btn-primary btn-block" style="padding: 0.75rem;">
+                        Reserve This Resource
+                    </a>
+                    <button th:if="${!resource.active}" class="btn btn-outline btn-block" disabled>
+                        Currently Inactive
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Daily Schedule Inspector -->
+        <div>
+            <div class="card" style="padding: 1.5rem;">
+                <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem;">Daily Schedule Inspector</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+                    Select a date to view existing confirmed reservations and plan conflict-free bookings.
+                </p>
+
+                <form th:action="@{/resources/{id}(id=${resource.id})}" method="get" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+                    <input type="date" name="date" class="form-control future-date" th:value="${targetDate}" required>
+                    <button type="submit" class="btn btn-outline">Inspect</button>
+                </form>
+
+                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem;">
+                    Booked Slots on <span th:text="${#temporals.format(targetDate, 'EEEE, dd MMMM yyyy')}" style="color: var(--primary);"></span>:
+                </h3>
+
+                <div th:if="${#lists.isEmpty(bookingsForDay)}" style="padding: 1.5rem; background: var(--success-bg); border-radius: var(--radius-sm); text-align: center; border: 1px dashed var(--success-border);">
+                    <p style="color: var(--success-text); font-weight: 600; margin-bottom: 0.25rem;">&#10003; All slots are currently available!</p>
+                    <p style="color: var(--success-text); font-size: 0.85rem;">No conflicting reservations are registered for this day.</p>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(bookingsForDay)}" class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Reserved Slot</th>
+                                <th>Purpose</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="b : ${bookingsForDay}">
+                                <td><strong th:text="${b.startTime} + ' - ' + ${b.endTime}">10:00 - 11:00</strong></td>
+                                <td th:text="${b.purpose}">Project Presentation</td>
+                                <td><span class="badge badge-confirmed">Confirmed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

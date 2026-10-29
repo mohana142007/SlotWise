@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Book Resource')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container">
+    <div style="margin-bottom: 1rem;">
+        <a th:href="@{/resources}" style="font-size: 0.9rem; font-weight: 600;">&larr; Back to Resource Catalog</a>
+    </div>
+
+    <div class="form-card" style="max-width: 650px;">
+        <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 style="font-size: 1.6rem; font-weight: 700; color: var(--text-main);">Reserve Resource</h1>
+                <span th:class="'badge ' + (${resource.type.name() == 'ROOM'} ? 'badge-room' : 'badge-equipment')"
+                      th:text="${resource.type.displayName}">Room</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">
+                Target Facility: <strong style="color: var(--text-main);" th:text="${resource.name}">Seminar Room A</strong>
+                &bull; Location: <span th:text="${resource.location}">Building 1</span>
+            </p>
+        </div>
+
+        <!-- Conflict or Validation Alert -->
+        <div th:if="${errorMessage}" class="alert alert-danger" style="margin-bottom: 1.5rem;">
+            <div>
+                <strong>Booking Conflict / Validation Error:</strong><br>
+                <span th:text="${errorMessage}">Error details</span>
+            </div>
+        </div>
+
+        <form th:action="@{/bookings}" th:object="${bookingRequest}" method="post">
+            <input type="hidden" th:field="*{resourceId}">
+
+            <div class="form-group">
+                <label for="bookingDate">Date of Reservation <span style="color: var(--danger);">*</span></label>
+                <input type="date" id="bookingDate" th:field="*{bookingDate}" class="form-control future-date" required>
+                <div class="form-error" th:if="${#fields.hasErrors('bookingDate')}" th:errors="*{bookingDate}"></div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="startTime">Start Time <span style="color: var(--danger);">*</span></label>
+                    <input type="time" id="startTime" th:field="*{startTime}" class="form-control" required>
+                    <div class="form-error" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="endTime">End Time <span style="color: var(--danger);">*</span></label>
+                    <input type="time" id="endTime" th:field="*{endTime}" class="form-control" required>
+                    <div class="form-error" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="purpose">Purpose of Booking <span style="color: var(--danger);">*</span></label>
+                <textarea id="purpose" th:field="*{purpose}" class="form-control" placeholder="e.g. B.Tech Major Project viva session and presentation review" required></textarea>
+                <div class="form-error" th:if="${#fields.hasErrors('purpose')}" th:errors="*{purpose}"></div>
+            </div>
+
+            <div style="background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                <strong>&#9432; Conflict Protection Notice:</strong>
+                SlotWise verifies that this resource has no overlapping bookings during the selected time window. Adjacent slots (such as 10:00–11:00 followed immediately by 11:00–12:00) are fully allowed.
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 2; padding: 0.75rem; font-size: 1rem;">Confirm Reservation</button>
+                <a th:href="@{/resources}" class="btn btn-outline" style="flex: 1; text-align: center;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

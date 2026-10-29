@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Sign In')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container" style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+    <div class="form-card" style="width: 100%; max-width: 440px;">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div class="brand-icon" style="margin: 0 auto 0.75rem auto; width: 44px; height: 44px; font-size: 1.3rem;">SW</div>
+            <h2 style="font-size: 1.5rem; font-weight: 700;">Sign in to SlotWise</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Enter your university credentials to continue</p>
+        </div>
+
+        <!-- Success Alert -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+        <!-- Logout Alert -->
+        <div th:if="${logoutMessage}" class="alert alert-info" th:text="${logoutMessage}"></div>
+
+        <!-- Error Alert -->
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="e.g. student@slotwise.edu" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 1rem; margin-top: 0.5rem;">Sign In</button>
+        </form>
+
+        <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color); font-size: 0.85rem; text-align: center; color: var(--text-muted);">
+            Don't have an account? <a th:href="@{/register}" style="font-weight: 600;">Create one here</a>
+        </div>
+
+        <div style="margin-top: 1rem; background: var(--bg-subtle); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--text-secondary);">
+            <strong>Quick Evaluation Credentials:</strong><br>
+            &bull; Admin: <code>admin@slotwise.edu</code> / <code>Admin@1234</code><br>
+            &bull; Student: <code>student@slotwise.edu</code> / <code>Student@1234</code>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
