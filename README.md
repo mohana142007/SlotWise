@@ -302,6 +302,12 @@ Visit: **[http://localhost:8080](http://localhost:8080)** (or your configured po
 
 ---
 
+## Jenkins CI
+
+The root `Jenkinsfile` checks out the job's configured Git source, runs `mvn -B clean verify`, publishes Surefire test reports, and archives the packaged JAR after a successful build. It uses `bat` on Windows agents and `sh` on Unix agents.
+
+Before running the pipeline, configure Jenkins tools named `JDK21` (JDK 21) and `Maven3` (Apache Maven 3.9+), and ensure the agent has access to MongoDB at `localhost:27017` for the integration tests. Install the Pipeline, Git, Maven Integration, and JUnit plugins. Create a Pipeline job pointing at this GitHub repository and set its script path to `Jenkinsfile`. Jenkins itself can be opened at `http://localhost:9090`; that port is separate from the application's port.
+
 ## 10. Default Evaluation Accounts
 
 | Role | Email Address | Password | Permissions |
