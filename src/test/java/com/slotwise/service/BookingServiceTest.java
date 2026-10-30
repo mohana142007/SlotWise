@@ -318,4 +318,46 @@ class BookingServiceTest {
             return true;
         }), eq(Booking.class));
     }
+
+    @Test
+    @DisplayName("getBookingsByUser queries mongoTemplate with user criteria and resolves references safely")
+    void testGetBookingsByUserQueriesAndEnsuresReferences() {
+        Booking booking = new Booking(student1, seminarRoom, LocalDate.now().plusDays(1), LocalTime.of(10, 0), LocalTime.of(11, 0), "Lab Session");
+        booking.setId("bk201");
+
+        when(mongoTemplate.find(any(Query.class), eq(Booking.class))).thenReturn(List.of(booking));
+
+        List<Booking> results = bookingService.getBookingsByUser(student1);
+
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        assertEquals("Lab Session", results.get(0).getPurpose());
+        assertEquals(student1.getFullName(), results.get(0).getUser().getFullName());
+        assertEquals(seminarRoom.getName(), results.get(0).getResource().getName());
+    }
+
+    @Test
+    @DisplayName("getAllBookings provides safe fallback placeholders when user or resource reference is null")
+    void testGetAllBookingsHandlesNullReferencesSafely() {
+        Booking orphanBooking = new Booking();
+        orphanBooking.setId("orphan1");
+        orphanBooking.setBookingDate(LocalDate.now().plusDays(1));
+        orphanBooking.setStartTime(LocalTime.of(10, 0));
+        orphanBooking.setEndTime(LocalTime.of(11, 0));
+        orphanBooking.setPurpose("Legacy Booking");
+        // user and resource are null
+
+        when(bookingRepository.findAllByOrderByBookingDateDescStartTimeDesc()).thenReturn(List.of(orphanBooking));
+
+        List<Booking> results = bookingService.getAllBookings();
+
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        Booking b = results.get(0);
+        assertNotNull(b.getUser(), "User fallback must not be null");
+        assertNotNull(b.getUser().getFullName(), "User full name must not be null");
+        assertNotNull(b.getResource(), "Resource fallback must not be null");
+        assertNotNull(b.getResource().getName(), "Resource name must not be null");
+        assertNotNull(b.getResource().getType(), "Resource type must not be null");
+    }
 }

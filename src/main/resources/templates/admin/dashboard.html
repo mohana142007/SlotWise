@@ -77,14 +77,14 @@
                     <tr th:each="b : ${recentBookings}">
                         <td><strong th:text="'#' + ${b.id}">#1</strong></td>
                         <td>
-                            <strong th:text="${b.user.fullName}">Alex Johnson</strong><br>
-                            <span style="font-size: 0.8rem; color: var(--text-muted);" th:text="${b.user.email}">student@slotwise.edu</span>
+                            <strong th:text="${b.user != null ? b.user.fullName : (b.userName != null ? b.userName : 'Registered User')}">Alex Johnson</strong><br>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);" th:text="${b.user != null ? b.user.email : (b.userEmail != null ? b.userEmail : 'N/A')}">student@slotwise.edu</span>
                         </td>
                         <td>
-                            <strong th:text="${b.resource.name}">Seminar Room A</strong><br>
-                            <span style="font-size: 0.8rem; color: var(--text-muted);" th:text="${b.resource.type.displayName}">Room</span>
+                            <strong th:text="${b.resource != null ? b.resource.name : (b.resourceName != null ? b.resourceName : 'Campus Resource')}">Seminar Room A</strong><br>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);" th:text="${b.resource != null && b.resource.type != null ? b.resource.type.displayName : (b.resourceType != null ? b.resourceType.displayName : 'Room')}">Room</span>
                         </td>
-                        <td th:text="${#temporals.format(b.bookingDate, 'dd MMM yyyy')}">2026-10-30</td>
+                        <td th:text="${b.bookingDate != null ? #temporals.format(b.bookingDate, 'dd MMM yyyy') : 'N/A'}">2026-10-30</td>
                         <td><strong th:text="${b.startTime} + ' - ' + ${b.endTime}">10:00 - 11:00</strong></td>
                         <td th:text="${b.purpose}">Project Defense</td>
                         <td>

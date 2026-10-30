@@ -283,7 +283,7 @@ On first launch, SlotWise automatically creates the default administrator accoun
 
 ### 1. Build and Package:
 ```powershell
-Set-Location "C:\Users\satya\.gemini\antigravity\scratch\slotwise"
+Set-Location "C:\Users\slotwise"
 mvn clean package -DskipTests
 ```
 
@@ -299,6 +299,34 @@ mvn spring-boot:run
 
 ### 3. Open in Browser:
 Visit: **[http://localhost:8080](http://localhost:8080)** (or your configured port).
+
+## Docker
+
+The root `Dockerfile` builds a fresh executable JAR with Maven and Java 21, then runs it on a Java 21 runtime image. The Docker build skips tests because the integration tests need MongoDB; the existing Jenkins pipeline runs `mvn -B clean verify` separately. The existing `target/slotwise-1.0.0.jar` is a Spring Boot executable, but it is not copied into the image. `.dockerignore` excludes `target` so a stale host artifact cannot affect the build.
+
+From the project root in PowerShell, build and run the image:
+
+```powershell
+docker build -t slotwise:local .
+docker run --name slotwise -p 8081:8081 `
+  -e "MONGO_URI=mongodb://host.docker.internal:27017/slotwise_db" `
+  slotwise:local
+```
+
+The application is then available at **http://localhost:8081**. Confirm it responds from another PowerShell window:
+
+```powershell
+Invoke-WebRequest http://localhost:8081 -UseBasicParsing
+```
+
+For local development with MongoDB running directly on Windows, `host.docker.internal` lets the container reach the Windows host; `localhost` inside the container would refer to the application container itself. Make sure MongoDB is running and listening on port `27017`. For a MongoDB instance using authentication or a different address, pass its connection URI through `MONGO_URI` instead; do not put credentials in the Dockerfile or source control. The application already reads this environment variable.
+
+To stop and remove the container after verification:
+
+```powershell
+docker stop slotwise
+docker rm slotwise
+```
 
 ---
 

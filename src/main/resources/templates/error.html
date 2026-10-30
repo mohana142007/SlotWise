@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('Error')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container" style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+    <div class="card" style="max-width: 540px; padding: 2rem; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem; color: var(--danger);">&#9888;</div>
+        <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;"
+            th:text="${errorCode != null ? errorCode : (status != null ? status + ' - ' + (error != null ? error : 'Error') : 'An Error Occurred')}">Error</h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;"
+           th:text="${errorMessage != null ? errorMessage : (message != null && !message.isEmpty() ? message : 'The requested action could not be completed.')}">
+            Error description
+        </p>
+        <div style="display: flex; gap: 0.75rem; justify-content: center;">
+            <a th:href="@{/dashboard}" class="btn btn-primary">Go to Dashboard</a>
+            <a th:href="@{/resources}" class="btn btn-outline">Browse Resources</a>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

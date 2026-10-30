@@ -26,6 +26,15 @@ public class Booking {
     @DBRef
     private Resource resource;
 
+    private String userId;
+    private String userName;
+    private String userEmail;
+
+    private String resourceId;
+    private String resourceName;
+    private ResourceType resourceType;
+    private String resourceLocation;
+
     @NotNull(message = "Booking date is required")
     private LocalDate bookingDate;
 
@@ -49,8 +58,8 @@ public class Booking {
     }
 
     public Booking(User user, Resource resource, LocalDate bookingDate, LocalTime startTime, LocalTime endTime, String purpose) {
-        this.user = user;
-        this.resource = resource;
+        this.setUser(user);
+        this.setResource(resource);
         this.bookingDate = bookingDate;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -68,19 +77,101 @@ public class Booking {
     }
 
     public User getUser() {
+        if (this.user == null && (this.userName != null || this.userEmail != null || this.userId != null)) {
+            User fallback = new User();
+            fallback.setId(this.userId != null ? this.userId : "N/A");
+            fallback.setFullName(this.userName != null ? this.userName : "User");
+            fallback.setEmail(this.userEmail != null ? this.userEmail : "");
+            return fallback;
+        }
         return user;
     }
 
     public void setUser(User user) {
         this.user = user;
+        if (user != null) {
+            if (user.getId() != null) this.userId = user.getId();
+            if (user.getFullName() != null) this.userName = user.getFullName();
+            if (user.getEmail() != null) this.userEmail = user.getEmail().trim().toLowerCase();
+        }
     }
 
     public Resource getResource() {
+        if (this.resource == null && (this.resourceName != null || this.resourceId != null)) {
+            Resource fallback = new Resource();
+            fallback.setId(this.resourceId != null ? this.resourceId : "N/A");
+            fallback.setName(this.resourceName != null ? this.resourceName : "Campus Resource");
+            fallback.setType(this.resourceType != null ? this.resourceType : ResourceType.ROOM);
+            fallback.setLocation(this.resourceLocation != null ? this.resourceLocation : "Campus");
+            return fallback;
+        }
         return resource;
     }
 
     public void setResource(Resource resource) {
         this.resource = resource;
+        if (resource != null) {
+            if (resource.getId() != null) this.resourceId = resource.getId();
+            if (resource.getName() != null) this.resourceName = resource.getName();
+            if (resource.getType() != null) this.resourceType = resource.getType();
+            if (resource.getLocation() != null) this.resourceLocation = resource.getLocation();
+        }
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail != null ? userEmail.trim().toLowerCase() : null;
+    }
+
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
+    }
+
+    public ResourceType getResourceType() {
+        return resourceType;
+    }
+
+    public void setResourceType(ResourceType resourceType) {
+        this.resourceType = resourceType;
+    }
+
+    public String getResourceLocation() {
+        return resourceLocation;
+    }
+
+    public void setResourceLocation(String resourceLocation) {
+        this.resourceLocation = resourceLocation;
     }
 
     public LocalDate getBookingDate() {

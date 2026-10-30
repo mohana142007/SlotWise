@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slotwise
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slotwise
+  template:
+    metadata:
+      labels:
+        app: slotwise
+    spec:
+      containers:
+        - name: slotwise
+          image: slotwise:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_DATA_MONGODB_URI
+              value: "mongodb://host.docker.internal:27017/slotwise_db"

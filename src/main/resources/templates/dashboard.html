@@ -59,18 +59,18 @@
                 <tbody>
                     <tr th:each="b : ${upcomingBookings}">
                         <td>
-                            <strong th:text="${b.resource.name}">Seminar Room A</strong><br>
-                            <span style="font-size: 0.8rem; color: var(--text-muted);" th:text="${b.resource.location}">Building 1</span>
+                            <strong th:text="${b.resource != null ? b.resource.name : (b.resourceName != null ? b.resourceName : 'Campus Resource')}">Seminar Room A</strong><br>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);" th:text="${b.resource != null ? b.resource.location : (b.resourceLocation != null ? b.resourceLocation : 'Campus')}">Building 1</span>
                         </td>
                         <td>
-                            <span th:class="'badge ' + (${b.resource.type.name() == 'ROOM'} ? 'badge-room' : 'badge-equipment')"
-                                  th:text="${b.resource.type.displayName}">Room</span>
+                            <span th:class="'badge ' + (${b.resource != null && b.resource.type != null && b.resource.type.name() == 'ROOM'} ? 'badge-room' : 'badge-equipment')"
+                                  th:text="${b.resource != null && b.resource.type != null ? b.resource.type.displayName : (b.resourceType != null ? b.resourceType.displayName : 'Room')}">Room</span>
                         </td>
-                        <td th:text="${#temporals.format(b.bookingDate, 'dd MMM yyyy')}">2026-10-30</td>
+                        <td th:text="${b.bookingDate != null ? #temporals.format(b.bookingDate, 'dd MMM yyyy') : 'N/A'}">2026-10-30</td>
                         <td><strong th:text="${b.startTime} + ' - ' + ${b.endTime}">10:00 - 11:00</strong></td>
                         <td th:text="${b.purpose}">Group Study</td>
                         <td>
-                            <span class="badge badge-confirmed" th:text="${b.status.displayName}">Confirmed</span>
+                            <span class="badge badge-confirmed" th:text="${b.status != null ? b.status.displayName : 'Confirmed'}">Confirmed</span>
                         </td>
                         <td>
                             <form th:action="@{/bookings/{id}/cancel(id=${b.id})}" method="post" class="confirm-cancel" style="display: inline;">
